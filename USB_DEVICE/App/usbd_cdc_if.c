@@ -40,6 +40,7 @@
   * @{
   */
 
+
 /** @addtogroup USBD_CDC_IF
   * @{
   */
