@@ -88,6 +88,19 @@ uint16_t own_queue_rear(own_queue_t *queue)
 {
     return (queue->rear%queue->max_size);
 }
+
+/**
+ * @name: 数组复制
+ * @param {queue 队列}
+ * @return:
+ */
+void own_queue_cpy(uint32_t *destin, uint32_t *source, uint32_t n)
+{
+    for(uint32_t i = 0; i < n; i++) {
+        *destin++ = *source++;
+    }
+}
+
 /**
  * @name: 入队列
  * @param {queue 队列， buf 数组指针，len 数据长度}
@@ -118,7 +131,7 @@ int own_queue_enter(own_queue_t *queue, void *buf, uint16_t len)
     }
 
     if ((queue->max_size - own_queue_front(queue)) < trace_len) {
-        memcpy((queue->buff + own_queue_front(queue) * queue->data_len),
+        own_queue_cpy((queue->buff + own_queue_front(queue) * queue->data_len),
                 buf,
                 (queue->data_len * (queue->max_size - own_queue_front(queue))));
 
@@ -127,7 +140,7 @@ int own_queue_enter(own_queue_t *queue, void *buf, uint16_t len)
         queue->front += (queue->max_size - own_queue_front(queue));
     }
 
-    memcpy((queue->buff + own_queue_front(queue)*queue->data_len),
+    own_queue_cpy((queue->buff + own_queue_front(queue)*queue->data_len),
             (buf + offset * queue->data_len),
             (trace_len * queue->data_len));
 
@@ -157,7 +170,7 @@ uint16_t own_queue_out(own_queue_t *queue,  void *buf, uint16_t len)
         return 0;
     }
     if ((queue->max_size - own_queue_rear(queue)) < trace_len) {
-        memcpy(buf,
+        own_queue_cpy(buf,
                 (queue->buff + own_queue_rear(queue) * queue->data_len),
                 ((queue->max_size - own_queue_rear(queue)) * queue->data_len));
 
@@ -166,7 +179,7 @@ uint16_t own_queue_out(own_queue_t *queue,  void *buf, uint16_t len)
         queue->rear += (queue->max_size - own_queue_rear(queue));
     }
 
-    memcpy((buf+offset * queue->data_len),
+    own_queue_cpy((buf+offset * queue->data_len),
             (queue->buff + own_queue_rear(queue) * queue->data_len),
             (trace_len * queue->data_len));
     queue->rear += trace_len;

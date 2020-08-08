@@ -23,7 +23,9 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "usbd_mc.h"
+#include "cmsis_gcc.h"
+#include "debug.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -279,8 +281,11 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_HS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 11 */
+   debug_array(Buf, *Len);
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+
+
   return (USBD_OK);
   /* USER CODE END 11 */
 }
@@ -294,14 +299,36 @@ static int8_t CDC_Receive_HS(uint8_t* Buf, uint32_t *Len)
   */
 uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 {
-  uint8_t result = USBD_OK;
-  /* USER CODE BEGIN 12 */
-  USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
-  if (hcdc->TxState != 0){
-    return USBD_BUSY;
-  }
-  USBD_CDC_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
-  result = USBD_CDC_TransmitPacket(&hUsbDeviceHS);
+    static uint32_t time = 0;
+
+    uint8_t result = USBD_OK;
+    /* USER CODE BEGIN 7 */
+
+    //HAL_NVIC_DisableIRQ(OTG_HS_IRQn);
+    //__set_PRIMASK(1);
+    __disable_irq();
+    MC_Switch_CDC(&hUsbDeviceHS);
+    USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
+    if (HAL_GetTick() - time > 500) {
+        hcdc->TxState = 0;
+    }
+
+    if (hcdc->TxState) {
+        __enable_irq();
+        return 1;
+    }
+    time = HAL_GetTick();
+
+    USBD_CDC_SetTxBuffer(&hUsbDeviceHS, Buf, Len);
+    result = USBD_CDC_TransmitPacket(&hUsbDeviceHS);
+
+   //HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
+    //__set_PRIMASK(0);
+    __enable_irq();
+
+    if (result != USBD_OK) {
+        eprintf("result %d\r\n", result);
+    }
   /* USER CODE END 12 */
   return result;
 }
@@ -318,7 +345,7 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
   * @param  Len: Number of data received (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
+int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 {
   uint8_t result = USBD_OK;
   /* USER CODE BEGIN 14 */

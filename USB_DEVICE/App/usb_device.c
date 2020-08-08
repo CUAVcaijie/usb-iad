@@ -28,7 +28,9 @@
 #include "usbd_storage_if.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "usbd_mc.h"
+#include "usbd_msc.h"
+#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN PV */
@@ -73,21 +75,26 @@ void MX_USB_DEVICE_Init(void)
   {
     Error_Handler();
   }
-  if (USBD_RegisterClass(&hUsbDeviceHS, &USBD_MSC) != USBD_OK)
-  {
-    Error_Handler();
-  }
-  if (USBD_MSC_RegisterStorage(&hUsbDeviceHS, &USBD_Storage_Interface_fops_HS) != USBD_OK)
-  {
-    Error_Handler();
-  }
+//  if (USBD_RegisterClass(&hUsbDeviceHS, &USBD_MSC) != USBD_OK)
+//  {
+//    Error_Handler();
+//  }
+//  if (USBD_MSC_RegisterStorage(&hUsbDeviceHS, &USBD_Storage_Interface_fops_HS) != USBD_OK)
+//  {
+//    Error_Handler();
+//  }
+
+    if (USBD_RegisterClass(&hUsbDeviceHS, &USBD_MC) != USBD_OK)
+    {
+      Error_Handler();
+    }
   if (USBD_Start(&hUsbDeviceHS) != USBD_OK)
   {
     Error_Handler();
   }
 
   /* USER CODE BEGIN USB_DEVICE_Init_PostTreatment */
-  HAL_PWREx_EnableUSBVoltageDetector();
+    HAL_PWREx_EnableUSBVoltageDetector();
 
   /* USER CODE END USB_DEVICE_Init_PostTreatment */
 }

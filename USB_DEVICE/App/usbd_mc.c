@@ -12,6 +12,7 @@
 #include "usbd_cdc_if.h"
 #include "usbd_cdc.h"
 #include "usbd_ctlreq.h"
+#include "debug.h"
 
 /** @defgroup MC_CORE_Private_FunctionPrototypes
   * @{
@@ -220,9 +221,9 @@ uint8_t USBD_MC_DeviceQualifierDesc[USB_LEN_DEV_QUALIFIER_DESC] =
   USB_DESC_TYPE_DEVICE_QUALIFIER,
   0x00,
   0x02,
-  0x00,
-  0x00,
-  0x00,
+  0xEF,
+  0x02,
+  0x01,
   MSC_MAX_FS_PACKET,
   0x01,
   0x00,
@@ -620,6 +621,8 @@ uint8_t  USBD_MC_Setup (USBD_HandleTypeDef *pdev, USBD_SetupReqTypedef *req)
 uint8_t  USBD_MC_DataIn (USBD_HandleTypeDef *pdev,
                               uint8_t epnum)
 {
+
+  eprintf("DataIn epnum: %x \r\n", epnum);
   if(epnum == (MC_MSC_EPIN_ADDR & 0x7f))
   {
     MC_Switch_MSC(pdev);
@@ -650,6 +653,7 @@ uint8_t  USBD_MC_DataIn (USBD_HandleTypeDef *pdev,
     }
     else
     {
+
       return USBD_FAIL;
     }
   }
@@ -667,6 +671,7 @@ uint8_t  USBD_MC_DataIn (USBD_HandleTypeDef *pdev,
 uint8_t  USBD_MC_DataOut (USBD_HandleTypeDef *pdev,
                                uint8_t epnum)
 {
+    eprintf("DataIn epnum: %x \r\n", epnum);
   if(epnum == MC_MSC_EPOUT_ADDR)
   {
     MC_Switch_MSC(pdev);
@@ -762,10 +767,13 @@ static uint8_t  USBD_MC_RxReady (USBD_HandleTypeDef *pdev)
 
   return USBD_OK;
 }
+//__attribute__((section(".RamD3Buffer")))
+    USBD_MSC_BOT_HandleTypeDef msc_handle;
+//__attribute__((section(".RamD3Buffer")))
+    USBD_CDC_HandleTypeDef cdc_handle;
 
 void MC_Switch_MSC(USBD_HandleTypeDef *pdev)
 {
-  static USBD_MSC_BOT_HandleTypeDef msc_handle;
 
   USBD_MSC_RegisterStorage(pdev, &USBD_Storage_Interface_fops_HS);
   pdev->pClassData = &msc_handle;
@@ -773,7 +781,7 @@ void MC_Switch_MSC(USBD_HandleTypeDef *pdev)
 
 void MC_Switch_CDC(USBD_HandleTypeDef *pdev)
 {
-  static USBD_CDC_HandleTypeDef cdc_handle;
+
   USBD_CDC_RegisterInterface(pdev, &USBD_Interface_fops_HS);
   pdev->pClassData = &cdc_handle;
 }
