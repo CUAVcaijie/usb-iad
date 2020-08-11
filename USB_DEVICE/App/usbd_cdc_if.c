@@ -174,7 +174,7 @@ static int8_t CDC_DeInit_HS(void)
   return (USBD_OK);
   /* USER CODE END 9 */
 }
-
+uint8_t cdc_flag = 0;
 /**
   * @brief  Manage the CDC class requests
   * @param  cmd: Command code
@@ -235,6 +235,7 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
       LineCoding.format = pbuf[4];
       LineCoding.paritytype = pbuf[5];
       LineCoding.datatype = pbuf[6];
+      cdc_flag = 1;
     break;
 
   case CDC_GET_LINE_CODING:
@@ -245,6 +246,7 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
       pbuf[4] = LineCoding.format;
       pbuf[5] = LineCoding.paritytype;
       pbuf[6] = LineCoding.datatype;
+      cdc_flag = 1;
     break;
 
   case CDC_SET_CONTROL_LINE_STATE:
@@ -303,7 +305,9 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
 
     uint8_t result = USBD_OK;
     /* USER CODE BEGIN 7 */
-
+    if (cdc_flag != 1) {
+        return 0;
+    }
     //HAL_NVIC_DisableIRQ(OTG_HS_IRQn);
     //__set_PRIMASK(1);
     __disable_irq();

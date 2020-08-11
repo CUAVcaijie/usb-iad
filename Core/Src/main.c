@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "sdmmc.h"
 #include "usart.h"
 #include "usb_device.h"
@@ -84,19 +85,8 @@ void sd_write(uint8_t chan, uint8_t *buff, uint32_t sector, uint32_t count)
         }
     }
     eprintf("sd_write err %d %d \r\n", ret, i);
-//    uint8_t i = 0;
-//    HAL_StatusTypeDef ret = HAL_ERROR;
-//    for ( i = 0; i < 10; i++) {
-//        ret = HAL_SD_WriteBlocks_DMA(&hsd1, buff, sector, count);
-//        if (ret == HAL_OK) {
-//            while(1) {
-//                if (w_flag == 1) {
-//                    return;
-//                }
-//            }
-//        }
-//    }
 }
+
 
 void sd_read(uint8_t chan, uint8_t *buff, uint32_t sector, uint32_t count)
 {
@@ -121,21 +111,6 @@ void sd_read(uint8_t chan, uint8_t *buff, uint32_t sector, uint32_t count)
         }
     }
     eprintf("sd_write err %d %d \r\n", ret, i);
-
-//    uint8_t i = 0;
-//    HAL_StatusTypeDef ret = HAL_ERROR;
-//    r_flag = 0;
-//    for (i = 0; i < 10; i++) {
-//        ret = HAL_SD_ReadBlocks_DMA(&hsd1, buff, sector, count);
-//        if (ret == HAL_OK) {
-//            while(1){
-//                if (r_flag == 1) {
-//                    return ;
-//                }
-//            }
-//        }
-//    }
-
 }
 
 
@@ -151,11 +126,9 @@ void HAL_SD_RxCpltCallback(SD_HandleTypeDef *hsd)
 
 void HAL_SD_ErrorCallback  (SD_HandleTypeDef *hsd)
 {
-    uint8_t i  =0;
 }
 void HAL_SD_AbortCallback  (SD_HandleTypeDef *hsd)
 {
-    uint8_t i  =0;
 }
 
 
@@ -191,6 +164,7 @@ void mpu_dma3_config(void)
   * @brief  The application entry point.
   * @retval int
   */
+//__attribute__((section(".RamD3Buffer"))) uint8_t sd_buf[512] = {0};
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -202,7 +176,7 @@ int main(void)
 
   /* Enable D-Cache---------------------------------------------------------*/
   SCB_EnableDCache();
-
+  mpu_dma3_config();
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -221,17 +195,19 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_UART7_Init();
   MX_SDMMC1_SD_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOH, GPIO_PIN_15, 0);
-  HAL_GPIO_WritePin(GPIOG, GPIO_PIN_7, 1);
+
   uint8_t i = 0;
+
+
 
 //  printf("test \r\n");
 //   uint8_t buff[512] = {0};
-
+//
 //   for(uint8_t i  = 0; i < 200; i++) {
 //       sd_read(0, buff, 0, 1);
 //   }
@@ -242,11 +218,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      //printf("test %d\r\n", i++);
+      //eprintf("test %d\r\n", i++);
 
       debug_loop(&huart7);
       if (i++ > 20) {
-          CDC_Transmit_HS((uint8_t*)"test\r\n", 6);
+         CDC_Transmit_HS((uint8_t*)"test\r\n", 6);
       }
       HAL_Delay(100);
     /* USER CODE END WHILE */

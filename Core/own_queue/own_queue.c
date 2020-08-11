@@ -94,7 +94,7 @@ uint16_t own_queue_rear(own_queue_t *queue)
  * @param {queue ╤сап}
  * @return:
  */
-void own_queue_cpy(uint32_t *destin, uint32_t *source, uint32_t n)
+void own_queue_cpy(uint8_t *destin, uint8_t *source, uint32_t n)
 {
     for(uint32_t i = 0; i < n; i++) {
         *destin++ = *source++;

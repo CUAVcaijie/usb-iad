@@ -768,20 +768,18 @@ static uint8_t  USBD_MC_RxReady (USBD_HandleTypeDef *pdev)
   return USBD_OK;
 }
 //__attribute__((section(".RamD3Buffer")))
-    USBD_MSC_BOT_HandleTypeDef msc_handle;
+USBD_MSC_BOT_HandleTypeDef msc_handle;
 //__attribute__((section(".RamD3Buffer")))
-    USBD_CDC_HandleTypeDef cdc_handle;
+USBD_CDC_HandleTypeDef cdc_handle;
 
 void MC_Switch_MSC(USBD_HandleTypeDef *pdev)
 {
-
   USBD_MSC_RegisterStorage(pdev, &USBD_Storage_Interface_fops_HS);
   pdev->pClassData = &msc_handle;
 }
 
 void MC_Switch_CDC(USBD_HandleTypeDef *pdev)
 {
-
   USBD_CDC_RegisterInterface(pdev, &USBD_Interface_fops_HS);
   pdev->pClassData = &cdc_handle;
 }
