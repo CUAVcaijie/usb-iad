@@ -206,7 +206,8 @@ int main(void)
 
 
 //  printf("test \r\n");
-//   uint8_t buff[512] = {0};
+   uint8_t buff[512] = {0};
+   uint16_t len = 0;
 //
 //   for(uint8_t i  = 0; i < 200; i++) {
 //       sd_read(0, buff, 0, 1);
@@ -222,7 +223,8 @@ int main(void)
 
       debug_loop(&huart7);
       if (i++ > 20) {
-         CDC_Transmit_HS((uint8_t*)"test\r\n", 6);
+          len = sprintf(buff, "test: %d \r\n", i);
+         CDC_Transmit_HS(buff, len);
       }
       HAL_Delay(100);
     /* USER CODE END WHILE */

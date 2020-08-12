@@ -314,6 +314,7 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len)
     MC_Switch_CDC(&hUsbDeviceHS);
     USBD_CDC_HandleTypeDef *hcdc = (USBD_CDC_HandleTypeDef*)hUsbDeviceHS.pClassData;
     if (HAL_GetTick() - time > 500) {
+        eprintf("Transmit HS ERR \r\n");
         hcdc->TxState = 0;
     }
 

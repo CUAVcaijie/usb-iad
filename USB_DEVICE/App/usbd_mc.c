@@ -145,7 +145,7 @@ uint8_t USBD_MC_CfgDesc[USB_MC_CONFIG_DESC_SIZ] =
   0x03,                           /* bmAttributes: Interrupt */
   LOBYTE(CDC_CMD_PACKET_SIZE),     /* wMaxPacketSize: */
   HIBYTE(CDC_CMD_PACKET_SIZE),
-  0x10,                           /* bInterval: */
+  0x00,                           /* bInterval: */
 
   /*Data class interface descriptor*/
   0x09,   /* bLength: Endpoint Descriptor size */
