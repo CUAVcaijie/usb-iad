@@ -156,16 +156,16 @@ void mpu_dma3_config(void)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-    mpu_dma3_config();
-    debug_init();
+
   /* USER CODE END 1 */
 
   /* Enable I-Cache---------------------------------------------------------*/
-  SCB_EnableICache();
+  //SCB_EnableICache();
 
   /* Enable D-Cache---------------------------------------------------------*/
-  SCB_EnableDCache();
-
+  //SCB_EnableDCache();
+    mpu_dma3_config();
+    debug_init();
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
