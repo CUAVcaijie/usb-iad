@@ -170,7 +170,10 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(8);
   } >RAM_D1
-
+  .RamD3Buffer : /*DMA*/
+  {
+    *(.RamD3Buffer)
+  } >RAM_D3     /*RAM_D3 DMA*/
   /* Remove information from the compiler libraries */
   /DISCARD/ :
   {
